@@ -10,6 +10,8 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
 model = resnet50(pretrained=True)
+# for p in model.parameters():
+#     p.requires_grad = False
 num_ftrs = model.fc.in_features
 model.fc = nn.Linear(num_ftrs, 10)
 
