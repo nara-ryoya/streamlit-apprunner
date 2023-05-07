@@ -2,8 +2,10 @@ volumes:
   ignore:
 version: '3.8'
 services:
-  streamlit-mnist:
-    build: .
+  train-mnist:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ipc: host
     runtime: nvidia
     environment:
@@ -11,5 +13,16 @@ services:
     volumes:
       - source: .
         target: /root/workdir
+        type: bind
+    tty: true
+  streamlit-mnist:
+    build:
+      context: .
+      dockerfile: DockerfileApp
+    ports:
+      - "8501:8501"
+    volumes:
+      - source: .
+        target: /root/app
         type: bind
     tty: true

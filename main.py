@@ -6,6 +6,11 @@ import torch
 from torch import nn
 from torchvision import transforms
 
+model = resnet50(pretrained=False)
+num_ftrs = model.fc.in_features
+model.fc = nn.Linear(num_ftrs, 10)
+model.load_state_dict(torch.load('models/model_2_acc_0.99.pth',  map_location=torch.device('cpu')))
+model.eval()
 
 uploaded_file = st.file_uploader("Choose a file")
 if uploaded_file is not None:
@@ -17,17 +22,7 @@ if uploaded_file is not None:
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
     ])
 
-    model = resnet50(pretrained=True)
-    num_ftrs = model.fc.in_features
-    model.fc = nn.Linear(num_ftrs, 10)
-    model.load_state_dict(torch.load('models/model_2_acc_0.99.pth'))
-    model.eval()
 
-
-    print(model(transform(image).unsqueeze(0)))
-    with torch.no_grad():
-        st.image(
-            image,
-            caption="uploaded image",
-            use_column_width=True,
-        )
+    output = model(transform(image).unsqueeze(0))
+    st.image(image, caption='Uploaded Image.', use_column_width=True)
+    st.text('Predicted: {}'.format(np.argmax(output.detach().numpy())))
